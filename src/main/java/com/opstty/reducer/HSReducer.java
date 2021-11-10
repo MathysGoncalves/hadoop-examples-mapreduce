@@ -8,20 +8,12 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-public class HSReducer extends Reducer<DoubleWritable, IntWritable, DoubleWritable, IntWritable> {
+public class HSReducer extends Reducer<DoubleWritable, Text, DoubleWritable, Text> {
 
-private IntWritable result = new IntWritable();
-
-public void reduce(DoubleWritable key, Iterable<IntWritable> values, Context context)
-        throws IOException, InterruptedException {
-
-        int value = 0;
-        for (IntWritable val : values) {
-            value += val.get();
+        public void reduce(DoubleWritable key, Iterable<Text> values, Context context)
+                throws IOException, InterruptedException {
+                for(Text value: values){
+                        context.write(key, value);
+                }
         }
-
-        result.set(value);
-        context.write(key, result);
-        }
-
 }

@@ -8,28 +8,18 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
 
-public class HSMapper extends Mapper<Object, Text, DoubleWritable, IntWritable> {
+public class HSMapper extends Mapper<Object, Text, DoubleWritable, Text> {
 
-    private IntWritable val = new IntWritable();
-    private  DoubleWritable word = new DoubleWritable();
-
-    public void map(Object key, Text value, Mapper.Context context)
+    public void map(Object key, Text value, Context context)
             throws IOException, InterruptedException {
 
-        String[] trees = (value.toString()).split(";");
-        if(!trees[0].equals("GEOPOINT")){ //ignore first line
-            try{
-                int objectId = Integer.parseInt(trees[11]); //get The object ID
-                word.set(Double.parseDouble(trees[6])); //get the height
+        String str = value.toString();
+        String[] split = str.split(";");
 
-                val.set(objectId);
-
-                context.write(word, val);
-            }catch (NumberFormatException e){}
-
-
+        for(int index = 0; index < split.length; index++) {
+            if(index == 2 && !split[0].contains("GEOPOINT") && (split[6].length() != 0)) {
+                context.write(new DoubleWritable(Double.parseDouble(split[6])), new Text(split[3]));
+            }
         }
     }
-
-
 }
